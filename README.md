@@ -1,7 +1,7 @@
-# CKO
-Cisco Kubernetes Operator (CKO) - An Operator for managing networking for Kubernetes clusters and more.
+# CNO
+Cisco Network Operator (CNO) - An Operator for managing networking for Kubernetes clusters and more (formerly known as Cisco Kubernetes Operator, CKO).
 
-> This branch of CKO contains the latest features and fixes but is still under development. Previous stable release (0.9.0) can be found [here](https://github.com/noironetworks/cko/tree/stable/0.9.0). 
+> This branch of CNO contains the latest features and fixes but is still under development. Previous stable release (0.9.0) can be found [here](https://github.com/noironetworks/cko/tree/stable/0.9.0). 
 
 # Table of Contents
 
@@ -9,7 +9,7 @@ Cisco Kubernetes Operator (CKO) - An Operator for managing networking for Kubern
 - [2. Features](#2-features)
   - [2.1 Supported Integrations](#21-supported-integrations)
   - [2.2 Under Development](#22-under-development)
-- [3. Deploying CKO](#3-deploying-cko)
+- [3. Deploying CNO](#3-deploying-cno)
   - [3.1 Control Cluster](#31-control-cluster)
     - [3.1.1 Prequisites](#311-prequisites)
     - [3.1.2 Install cert-manager](#312-install-cert-manager)
@@ -18,7 +18,7 @@ Cisco Kubernetes Operator (CKO) - An Operator for managing networking for Kubern
   - [3.2 Workload Cluster](#32-workload-cluster)
     - [3.2.1 Create Secret for Github access](#321-create-secret-for-github-access)
     - [3.2.2 Deploy Manifests](#322-deploy-manifests)
-- [4. Using CKO](#4-using-cko)
+- [4. Using CNO](#4-using-cno)
   - [4.1 Workflows](#41-workflows)
     - [4.1.1 Fabric Onboarding](#411-fabric-onboarding)
       - [4.1.1.1 Fabric Identity](#4111-fabric-identity)
@@ -37,8 +37,8 @@ Cisco Kubernetes Operator (CKO) - An Operator for managing networking for Kubern
     - [4.1.5 Managing Clusters Individually](#415-managing-clusters-individually)
     - [4.1.6 Customizing Default Behaviors](#416-customizing-default-behaviors)
     - [4.1.7 Upgrade Managed CNI Operators](#417-upgrade-managed-cni-operators)
-    - [4.1.8 Upgrade CKO in Workload Cluster](#418-upgrade-cko-in-workload-cluster)
-    - [4.1.9 Deleting CKO from Workload Cluster](#419-deleting-cko-from-workload-cluster)
+    - [4.1.8 Upgrade CNO in Workload Cluster](#418-upgrade-cno-in-workload-cluster)
+    - [4.1.9 Deleting CNO from Workload Cluster](#419-deleting-cno-from-workload-cluster)
     - [4.1.10 Upgrade Control Cluster](#4110-upgrade-control-cluster)
   - [4.2 API Reference](#42-api-reference)
   - [4.3 Sample Configuration](#43-sample-configuration)
@@ -49,24 +49,24 @@ Cisco Kubernetes Operator (CKO) - An Operator for managing networking for Kubern
   - [6.1 Brownfield case](#61-brownfield-case)
 - [7. Contributing](#7-contributing)
   - [7.1 Repositories](#71-repositories)
-  - [7.2 Contributing to CKO](#72-contributing-to-cko)
+  - [7.2 Contributing to CNO](#72-contributing-to-cno)
   - [7.3 Experimenting with Control Cluster](#73-experimenting-with-control-cluster)
 - [Appendix](#Appendix)
   - [Single Node Control Cluster](#single-node-control-cluster)
   - [Control Cluster Install Configuration](#control-cluster-install-configuration)
-  - [CKO Cleanup in Workload Cluster](#cko-cleanup-in-workload-cluster)
+  - [CNO Cleanup in Workload Cluster](#cno-cleanup-in-workload-cluster)
 
 ## 1. Introduction
 
 The [CNCF Cloud Native Landscape](https://landscape.cncf.io/?grouping=category) illustrates the rich and rapidly evolving set of projects and compnents in the Cloud Native Networking domain. Using these components requires installation and operational knowledge of each one of those. It also leaves the burden on the user to harmonize the configuration across the networking layers and components to ensure that everything works in sync. This gets even more complicated when you consider that most production solutions run applications which are deployed across multiple Kubernetes clusters.
 
-CKO aims to alleviate this complexity and reduce the operational overhead by:
+CNO aims to alleviate this complexity and reduce the operational overhead by:
 * Automation - Providing resource management across network resources and automating the composition of networks and services
 * Observability - Providing observability by correlating between clusters and infrastructure, by centralized data collection and eventing, and by health check and reporting at global level
 * Operations - Providing operational benefits via centralized network governance, migration of workloads, and cost optimization across cluster sprawl
 * Security - Providing multi-cluster security by federating identity across domains
 
-CKO achieves this by defining simple abstractions to meet the needs of he following persona:
+CNO achieves this by defining simple abstractions to meet the needs of he following persona:
 * Kubernetes Admin - responsible for managing the cluster
 * Cloud Admin - responsible for the coordinating the infrastructure needs of a cluster
 * Network Admin - responsible for the network infrastructure
@@ -79,16 +79,16 @@ These abstractions are modeled to capture the user's intent and then consistentl
 
 The diagram below illustrates the relationship between these abstactions.
 
-![CKO Resources](docs/user-guide/diagrams/class-diagram.drawio.png)
+![CNO Resources](docs/user-guide/diagrams/class-diagram.drawio.png)
 
 The abstractions ensure that these persona can seamlessly collaborate to dynamically satisfy the networking needs of the set of clusters they manage. The abstractions are flexible and can be applied to a group of clusters which can be managed as a whole, or can be used to create individual snowflakes. 
 
-The diagram below illustrates a typical CKO deployment comprising of one Control Cluster and one or more Workload Clusters with the following CKO components:
+The diagram below illustrates a typical CNO deployment comprising of one Control Cluster and one or more Workload Clusters with the following CNO components:
 * A centralized "Org Operator" for identity and resource management 
 * One or more "Fabric Operators" for network infrastructure automation and kubernetes manifest generation
 * "Per Cluster Operators" for managing the lifecycle of network components in the Workload Cluster
 
-The Workload Cluster runs the user's applications. The lifecycle of all the clusters is managed by the user; CKO only requires that specific operators be run in these. The lifecycle of CKO in the Workload Cluster, once deployed, is managed by the Control Cluster.
+The Workload Cluster runs the user's applications. The lifecycle of all the clusters is managed by the user; CNO only requires that specific operators be run in these. The lifecycle of CNO in the Workload Cluster, once deployed, is managed by the Control Cluster.
 
 ![Control and Workload Cluster](docs/user-guide/diagrams/control-and-workload-clusters.drawio.png)
 
@@ -127,8 +127,8 @@ Support for the following technologies and products is being actively pursued:
 
 The above list is not comprehensive and we are constantly evaluating and adding new features for support based on user demand.
 
-## 3. Deploying CKO
-CKO requires one Control Cluster to be deployed with the CKO operators before any Workload Clusters can be managed by CKO. Existing Workload Clusters with a functioning CNI can be imported into CKO.
+## 3. Deploying CNO
+CNO requires one Control Cluster to be deployed with the CNO operators before any Workload Clusters can be managed by CNO. Existing Workload Clusters with a functioning CNI can be imported into CNO.
 
 ### 3.1 Control Cluster
 This section describes the setup of the Control Cluster that manages the Workload Clusters.
@@ -148,7 +148,7 @@ A new Control Cluster can be deployed using [this script](scripts/install-contro
 --no_proxy <localhost,127.0.0.1>
 ```
 
-The Git repo is used by CKO to store configuration and status information. The http_proxy, https_proxy and no_proxy are optional arguments and need to be supplied if the host on which you are deploying the Control Cluster requires a proxy to connect to the Internet.
+The Git repo is used by CNO to store configuration and status information. The http_proxy, https_proxy and no_proxy are optional arguments and need to be supplied if the host on which you are deploying the Control Cluster requires a proxy to connect to the Internet.
 
 The following subsections describe the individual steps to install the Control Cluster if customizations are desired in the Control Cluster installation. If the Control Cluster is already deployed using the above script, please skip the following subsections and proceed to the [Workload Cluster](#32-workload-cluster).
 
@@ -172,7 +172,7 @@ helm install \
 ```
 
 #### 3.1.3 Create Secret for Github access
-CKO follows the [GitOps](https://www.weave.works/technologies/gitops/) model using [Argo CD](https://github.com/argoproj/argo-cd) for syncing configuration between Control and Workload clusters. The Git repository details can be provided as shown below. The configuration below assumes that the Git repository is hosted in Github. You can optionally add the HTTP_PROXY details if your clusters require it to communicate with Github.
+CNO follows the [GitOps](https://www.weave.works/technologies/gitops/) model using [Argo CD](https://github.com/argoproj/argo-cd) for syncing configuration between Control and Workload clusters. The Git repository details can be provided as shown below. The configuration below assumes that the Git repository is hosted in Github. You can optionally add the HTTP_PROXY details if your clusters require it to communicate with Github.
 
 ```bash
 kubectl create ns netop-manager
@@ -199,7 +199,7 @@ kubectl label secret cko-argo -n netop-manager 'argocd.argoproj.io/secret-type'=
 ```
 
 #### 3.1.4 Deploy using Helm
-Use the template provided in the [Appendix](#control-cluster-install-configuration) to create the ```my_values.yaml``` used during the helm install of CKO in the control cluster. It sets the relevant image registries, tags and optionally HTTP-Proxy configuration.
+Use the template provided in the [Appendix](#control-cluster-install-configuration) to create the ```my_values.yaml``` used during the helm install of CNO in the control cluster. It sets the relevant image registries, tags and optionally HTTP-Proxy configuration.
 
 ``` bash
 
@@ -211,11 +211,11 @@ helm install netop-org-manager cko/netop-org-manager -n netop-manager --create-n
 Argo CD is automatically deployed in the Control Cluster (in the netop-manager namespace) and in the Workload Cluster (in the netop-manager-system namespace). By default Argo CD starts reconciliation with the git repository every [180s](https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cm.yaml#L283). The reconciliation time depends on the number of objects being synchronized and can potentially take longer at times. If more frequent synchronization is required you can follow the process described [here](https://www.buchatech.com/2022/08/how-to-set-the-application-reconciliation-timeout-in-argo-cd/) to reduce time interval between the reconciliation start times.
 
 ### 3.2 Workload Cluster
-CKO handles the integration and management of the CNI in the Workload Clusters as two distinct cases:
-* Brownfield - The Workload Cluster already exists with a fully functioning and supported CNI. An import workflow is used to make the CNI in such a cluster visible to the Control Cluster. In the Brownfield case CKO further provides the choice of (a) only observing, or (b) fully managing the CNI, and referred to as "Unmanaged" or "Managed" states respectively. The import workflow upon successful completion will always result in the "Unmanaged" state. The CNI can be moved to a "Managed" state through an explicit action by the user. Please refer to the [Brownfield case workflow](#412-brownfield-clusters) section for proceeding further.
+CNO handles the integration and management of the CNI in the Workload Clusters as two distinct cases:
+* Brownfield - The Workload Cluster already exists with a fully functioning and supported CNI. An import workflow is used to make the CNI in such a cluster visible to the Control Cluster. In the Brownfield case CNO further provides the choice of (a) only observing, or (b) fully managing the CNI, and referred to as "Unmanaged" or "Managed" states respectively. The import workflow upon successful completion will always result in the "Unmanaged" state. The CNI can be moved to a "Managed" state through an explicit action by the user. Please refer to the [Brownfield case workflow](#412-brownfield-clusters) section for proceeding further.
 * Greenfield - A new Workload Cluster needs to be installed. The network configuration for this planned cluster is initiated from the Control Cluster by creating the relevant ClusterProfile and/or ClusterGroupProfile/ClusterNetworkProfile CRs. Please refer to the [Greenfield case workflow](#413-greenfield-clusters) section for proceeding further.
 
-The rest of this section provides the steps for deploying the CKO components in the Workload Cluster. However, prior to any action in the Workload Cluster, the user needs to identify and initiate the appropriate [Brownfield case workflow](#412-brownfield-clusters) or the [Greenfield case workflow](#413-greenfield-clusters) at least once for the Workload Cluster under consideration. 
+The rest of this section provides the steps for deploying the CNO components in the Workload Cluster. However, prior to any action in the Workload Cluster, the user needs to identify and initiate the appropriate [Brownfield case workflow](#412-brownfield-clusters) or the [Greenfield case workflow](#413-greenfield-clusters) at least once for the Workload Cluster under consideration. 
 
 #### 3.2.1 Create Secret for Github access
 Provide the same Git repository details as those in the Control Cluster.
@@ -280,12 +280,12 @@ kubectl apply -f https://raw.githubusercontent.com/noironetworks/netop-manifests
 kubectl create -f https://raw.githubusercontent.com/noironetworks/netop-manifests/cko-mvp-1/workload/platformInstaller.yaml
 ```
 
-## 4. Using CKO
+## 4. Using CNO
 
 ### 4.1 Workflows
 
 #### 4.1.1 Fabric Onboarding
-Each network infrasructure unit (referred to as a fabric) that is managed as an independent entity, is modeled in CKO using the FabricInfra CRD. The network admin creates a FabricInfra CR to establish the identity of the of that fabric, and allows the network admin to specify the set of resources available to be consumed on that fabric. CKO reserves these resources in the FabricInfra on the cluster's behalf, and performs the necessary provisioning on the fabric to enable the networking for the cluster.
+Each network infrasructure unit (referred to as a fabric) that is managed as an independent entity, is modeled in CNO using the FabricInfra CRD. The network admin creates a FabricInfra CR to establish the identity of the of that fabric, and allows the network admin to specify the set of resources available to be consumed on that fabric. CNO reserves these resources in the FabricInfra on the cluster's behalf, and performs the necessary provisioning on the fabric to enable the networking for the cluster.
 
 ##### 4.1.1.1 Fabric Identity
 The following fields are required when creating the FabricInfra:
@@ -310,7 +310,7 @@ kubectl create secret -n netop-manager generic apic-credentials --from-literal=u
 The username provided above should have privileges to access at least the "common" tenant on the APIC.
 
 ##### 4.1.1.2 Fabric Resources for Brownfield Clusters
-Fabric requirements for subnets, VLAN and external connectivity do not need to be explicitly defined in the FabricInfra spec for imported clusters. Since these resources are already in use on the fabric, CKO will learn them at the time of importing a particular cluster, and automatically reserve them in the FabricInfra. These resources will however not be released to the available pool when the imported cluster is removed from CKO.
+Fabric requirements for subnets, VLAN and external connectivity do not need to be explicitly defined in the FabricInfra spec for imported clusters. Since these resources are already in use on the fabric, CNO will learn them at the time of importing a particular cluster, and automatically reserve them in the FabricInfra. These resources will however not be released to the available pool when the imported cluster is removed from CNO.
 
 If dealing only with brownfield clusters no further configuration is required to be specified in the FabricInfra.
 
@@ -347,7 +347,7 @@ The snippet below shows how subnets used for node networks, multicast (for ACI-C
 
 If fabric resources are being allocated from the FabricInfra pools, at least two internal subnets, one multicast subnet, two external subnets, and two VLANs need to be available for a greenfield cluster with ACI-CNI, or at least one external subnet needs to be available for a greenfield cluster with Calico CNI.
 
-CKO will automatically pick available resources from resource pools. Resources are picked in round-robin fashion. CKO currently does not partition the subnets, so each subnet specified in the resource pool is treated as an indivisible pool. If smaller subnets are desired, they should be listed as individual subnets.
+CNO will automatically pick available resources from resource pools. Resources are picked in round-robin fashion. CNO currently does not partition the subnets, so each subnet specified in the resource pool is treated as an indivisible pool. If smaller subnets are desired, they should be listed as individual subnets.
 
 Note: The pod subnet is not picked from the pool since its local to a cluster. It defaults to ```10.2.0.0/16``` and can be overridden in the ClusterProfile, or ClusterGroupProfile, or ClusterNetworkProfile.
 
@@ -369,7 +369,7 @@ The kubernetes_node-to-fabric and fabric-to-external connectivity on each fabric
     ...
 ```
 
-At least one context is required for each cluster, and all fields in the context are required. CKO currently does not create ACI AEP, VRF, and L3out; they have to be created by the network admin and referenced in the above configuration.
+At least one context is required for each cluster, and all fields in the context are required. CNO currently does not create ACI AEP, VRF, and L3out; they have to be created by the network admin and referenced in the above configuration.
 
 ##### 4.1.1.3.3 Topology
 The kubernetes_nodes and top-of-the-rack interconnection topology per fabric is captured in the topology section as shown below:
@@ -472,7 +472,7 @@ The complete API spec for the FabricInfra can be found here: [CRD](docs/control-
 An example of the FabricInfra CR can be found here: [Example CR](config/samples/aci-cni/kubernetes/fabricinfra.yaml)
 
 #### 4.1.2 Brownfield Clusters
-Existing clusters with a functional CNI provisioned with acc-provision flavors for release 5.2.3.4 can be imported into CKO. Please refer to the following documentation for installing a cluster with ACI CNI or Calico CNI on ACI:
+Existing clusters with a functional CNI provisioned with acc-provision flavors for release 5.2.3.4 can be imported into CNO. Please refer to the following documentation for installing a cluster with ACI CNI or Calico CNI on ACI:
 * ACI CNI
     * [Cisco ACI and Kubernetes Integration](https://www.cisco.com/c/en/us/td/docs/switches/datacenter/aci/apic/sw/kb/b_Kubernetes_Integration_with_ACI.html#task_ggz_svz_r1b)
     * [Installing OpenShift 4.10 on Bare Metal](https://www.cisco.com/c/en/us/td/docs/dcn/aci/containers/installation/installing-openshift-4-10-on-baremetal.html)
@@ -481,7 +481,7 @@ Existing clusters with a functional CNI provisioned with acc-provision flavors f
 * Calico CNI
     * [Cisco ACI and Calico 3.23.2 Integration](https://www.cisco.com/c/en/us/td/docs/dcn/aci/containers/installation/cisco-aci-calico-integration/cisco-aci-with-calico-integration.html)
 
- The imported cluster will initially have its CNI in an observed, but unmanaged, state by CKO. After succesfully importing the cluster, the CNI can be transitioned to a managed state after which the CNI's configuration and lifecycle can be completely controlled from the Control Cluster.
+ The imported cluster will initially have its CNI in an observed, but unmanaged, state by CNO. After succesfully importing the cluster, the CNI can be transitioned to a managed state after which the CNI's configuration and lifecycle can be completely controlled from the Control Cluster.
 
 ##### 4.1.2.1 Unmanaged CNI
 * Pre-requisite: The network admin has on-boarded the fabric by creating a [FabricInfra CR](#4111-fabric-identity).
@@ -490,7 +490,7 @@ This worfklow is initiated in the Workload Cluster which needs to be imported.
 
 The first step is to create the secrets to access a Github repo as shown [here](#321-create-secret-for-github-access).
 
-Then apply the CKO workload cluster operator manifests as show [here](#322-deploy-manifests).
+Then apply the CNO workload cluster operator manifests as show [here](#322-deploy-manifests).
 
 Once applied, the notification to import the cluster will be sent to the Control Cluster via Gitops. Once Argo CD syncs on the Control Cluster you will see the following following two resources getting created:
 
@@ -592,7 +592,7 @@ status:
   - 101
   - 102
   workload_cluster_manifest_locations:
-  - 'argo: https://github.com/networkoperator/ckogitrepo/tree/test/workload/argo/bm2acicni'
+  - 'argo: https://github.com/networkoperator/CNOgitrepo/tree/test/workload/argo/bm2acicni'
   - 'operator: https://github.com/networkoperator/ckogitrepo/tree/test/workload/config/bm2acicni' 
 ```
 
@@ -604,7 +604,7 @@ The complete API spec for the ClusterProfile can be found here: [CRD](docs/contr
 
 An example of the ClusterProfile CR can be found here: [Example CR](config/samples/aci-cni/kubernetes/clusterGroupProfile/clusterprofile_k8s.yaml)
 
-Once the ClusterProfile CR is created successfully, the focus shifts to the Workload Cluster to deploy CKO operator by following these [instructions](#32-workload-cluster). This will result in CKO running in the Workload Cluster and which will in turn deploy the CNI.
+Once the ClusterProfile CR is created successfully, the focus shifts to the Workload Cluster to deploy CNO operator by following these [instructions](#32-workload-cluster). This will result in CNO running in the Workload Cluster and which will in turn deploy the CNI.
 
 #### 4.1.4 Managing Clusters as a Group
 
@@ -612,7 +612,7 @@ Create ClusterGroupProfile with common properties like CNI, Distro etc, set labe
 
 After creating the ClusterProfile for a cluster, set ClusterGroupProfileSelector to match ClusterGroupProfile's labels.
 
-Also updates to properties such as CNI management modes (managed versus unmanaged), CKO version, and CNI versions can be done in the ClusterGroupProfile instead of individual clusters.
+Also updates to properties such as CNI management modes (managed versus unmanaged), CNO version, and CNI versions can be done in the ClusterGroupProfile instead of individual clusters.
 
 The complete API spec for the ClusterGroupProfile can be found here: [CRD](docs/control-cluster/api_docs.md#clustergroupprofile)
 
@@ -655,8 +655,8 @@ For Calico CNI:
                         ...
 ```
 
-#### 4.1.8 Upgrade CKO in Workload Cluster
-Update CKO version in ClusterProfile by changing the following:
+#### 4.1.8 Upgrade CNO in Workload Cluster
+Update CNO version in ClusterProfile by changing the following:
 
 ```bash
 ...
@@ -666,8 +666,8 @@ Update CKO version in ClusterProfile by changing the following:
 ...
 ```
 
-#### 4.1.9 Deleting CKO from Workload Cluster
-To avoid accidentally breaking the Workload Cluster, deletion of CKO and/or the CNI is an explicit step. Please refer to the cleanup instructions in the [Appendix](#cko-cleanup-in-workload-cluster) to initiate this cleanup. The ClusterProfile should be deleted only after the cleanup has been performed on the Workload Cluster. The configuration on the Fabric for this cluster is cleaned up after the ClusterProfile is deleted.
+#### 4.1.9 Deleting CNO from Workload Cluster
+To avoid accidentally breaking the Workload Cluster, deletion of CNO and/or the CNI is an explicit step. Please refer to the cleanup instructions in the [Appendix](#cno-cleanup-in-workload-cluster) to initiate this cleanup. The ClusterProfile should be deleted only after the cleanup has been performed on the Workload Cluster. The configuration on the Fabric for this cluster is cleaned up after the ClusterProfile is deleted.
 
 #### 4.1.10 Upgrade Control Cluster
 To upgrade from 0.9.0 release to 0.9.1 use the following helm upgrade command using the template provided in the [Appendix](#control-cluster-install-configuration) to create the ```my_values.yaml```:
@@ -697,7 +697,7 @@ As an alternative to the above helm command, in the dev environment, the followi
 
 ## 5. Observability & Diagnostics
 
-CKO has built-in diagnostic tools that provides insights in to the state of network configuration on both control and workload cluster sides. 
+CNO has built-in diagnostic tools that provides insights in to the state of network configuration on both control and workload cluster sides. 
 
 ### 5.1 Diagnostics on the Control Cluster
 
@@ -927,14 +927,14 @@ Once corresponding notifications are available, the ClusterProfile and ClusterNe
 
 * Workload Cluster Manifests: [netop-manifests](https://github.com/noironetworks/netop-manifests)
 
-* User Documentation: [cko](https://github.com/noironetworks/cko)
+* User Documentation: [cno](https://github.com/noironetworks/cno)
 
-### 7.2 Contributing to CKO
+### 7.2 Contributing to CNO
 
 [Developer Guide](docs/dev-guide/dev-and-contribute.md)
 
 ### 7.3 Experimenting with Control Cluster
-CKO Control Cluster can be deployed in a disconnected mode from all fabrics. Edit defaults-global-fabricinfra ConfigMap:
+CNO Control Cluster can be deployed in a disconnected mode from all fabrics. Edit defaults-global-fabricinfra ConfigMap:
 
 ```bash
 apiVersion: v1
@@ -968,7 +968,7 @@ spec:
 ### Single Node Control Cluster
 A simple single node cluster can be deployed using [Kind](https://kind.sigs.k8s.io/). This section describes the steps to get a single node kind cluster installed.
 
-A Kind-based cluster should not be used in production. Please refer to [production best practices](https://kubernetes.io/docs/setup/production-environment/) before deploying a CKO Control Cluster for production use.
+A Kind-based cluster should not be used in production. Please refer to [production best practices](https://kubernetes.io/docs/setup/production-environment/) before deploying a CNO Control Cluster for production use.
 
 #### Install Docker Engine
 If Docker is not installed, please [install](https://docs.docker.com/engine/install/) it first.
@@ -1008,7 +1008,7 @@ kubectl version --client"
 Install Helm using [these](https://helm.sh/docs/intro/install/) istructions.
 
 ### Control Cluster Install Configuration
-Use the following ```my_values.yaml``` when installing the CKO Helm Chart for the Control Cluster for release 0.9.1:
+Use the following ```my_values.yaml``` when installing the CNO Helm Chart for the Control Cluster for release 0.9.1:
 
 ``` bash
 
@@ -1101,10 +1101,10 @@ kubernetes-dashboard:
 EOF
 ```
 
-### CKO Cleanup in Workload Cluster
-[This script](scripts/cleanup-workload-cluster.sh) can be used to clean up CKO in the Workload Cluster (note the script will optionally allow you to delete CNI):
+### CNO Cleanup in Workload Cluster
+[This script](scripts/cleanup-workload-cluster.sh) can be used to clean up CNO in the Workload Cluster (note the script will optionally allow you to delete CNI):
 
-### CKO Auto-Restore in Control Cluster
+### CNO Auto-Restore in Control Cluster
 
 The features provide functionality to pull the manifests from GitHub repo control/restore folder and apply it to the newly deployed control
 cluster. This will help in auto-restore the control-cluster in case of failure or inaccessibility of the pre-existing cluster
@@ -1204,7 +1204,7 @@ In case restore functionality is configured and still do not see files being pus
 ```
 -This will restart the netop-org-manager pod with auto-restore enabled
 
-### CKO Shadow Resource in Control Cluster
+### CNO Shadow Resource in Control Cluster
 
 The features offer a backup mechanism for the generated acc_provision_input and netop-manager deployment manifests, 
 ensuring their preservation in the event of APIC unprovisioning failure.
