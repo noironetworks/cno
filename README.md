@@ -11,7 +11,7 @@ Cisco Network Operator (CNO) - An Operator for managing networking for Kubernete
   - [2.2 Under Development](#22-under-development)
 - [3. Deploying CNO](#3-deploying-cno)
   - [3.1 Control Cluster](#31-control-cluster)
-    - [3.1.1 Prequisites](#311-prequisites)
+    - [3.1.1 Prerequisites](#311-prequisites)
     - [3.1.2 Install cert-manager](#312-install-cert-manager)
     - [3.1.3 Create Secret for Github access](#313-create-secret-for-github-access)
     - [3.1.4 Deploy using Helm](#314-deploy-using-helm)
@@ -44,7 +44,7 @@ Cisco Network Operator (CNO) - An Operator for managing networking for Kubernete
   - [4.3 Sample Configuration](#43-sample-configuration)
 - [5. Observability & Diagnostics](#5-observability--diagnostics)
   - [5.1 Diagnostics on the Control Cluster](#51-diagnostics-on-the-control-cluster)
-  - [5.2 Diagnosticson on the Workload Clusters](#52-diagnostics-on-the-workload-cluster)
+  - [5.2 Diagnostics on the Workload Clusters](#52-diagnostics-on-the-workload-cluster)
 - [6. Troubleshooting](#6-troubleshooting)
   - [6.1 Brownfield case](#61-brownfield-case)
 - [7. Contributing](#7-contributing)
@@ -58,7 +58,7 @@ Cisco Network Operator (CNO) - An Operator for managing networking for Kubernete
 
 ## 1. Introduction
 
-The [CNCF Cloud Native Landscape](https://landscape.cncf.io/?grouping=category) illustrates the rich and rapidly evolving set of projects and compnents in the Cloud Native Networking domain. Using these components requires installation and operational knowledge of each one of those. It also leaves the burden on the user to harmonize the configuration across the networking layers and components to ensure that everything works in sync. This gets even more complicated when you consider that most production solutions run applications which are deployed across multiple Kubernetes clusters.
+The [CNCF Cloud Native Landscape](https://landscape.cncf.io/?grouping=category) illustrates the rich and rapidly evolving set of projects and components in the Cloud Native Networking domain. Using these components requires installation and operational knowledge of each one of those. It also leaves the burden on the user to harmonize the configuration across the networking layers and components to ensure that everything works in sync. This gets even more complicated when you consider that most production solutions run applications which are deployed across multiple Kubernetes clusters.
 
 CNO aims to alleviate this complexity and reduce the operational overhead by:
 * Automation - Providing resource management across network resources and automating the composition of networks and services
@@ -152,7 +152,7 @@ The Git repo is used by CNO to store configuration and status information. The h
 
 The following subsections describe the individual steps to install the Control Cluster if customizations are desired in the Control Cluster installation. If the Control Cluster is already deployed using the above script, please skip the following subsections and proceed to the [Workload Cluster](#32-workload-cluster).
 
-#### 3.1.1 Prequisites
+#### 3.1.1 Prerequisites
 * A functional Kubernetes cluster with reachability to the ACI Fabric that will serve as the Control Cluster. A single node cluster is adequate, refer to [Appendix](#single-node-control-cluster) for a quick guide on how to set up one.
 * kubectl
 * Helm
@@ -285,7 +285,7 @@ kubectl create -f https://raw.githubusercontent.com/noironetworks/netop-manifest
 ### 4.1 Workflows
 
 #### 4.1.1 Fabric Onboarding
-Each network infrasructure unit (referred to as a fabric) that is managed as an independent entity, is modeled in CNO using the FabricInfra CRD. The network admin creates a FabricInfra CR to establish the identity of the of that fabric, and allows the network admin to specify the set of resources available to be consumed on that fabric. CNO reserves these resources in the FabricInfra on the cluster's behalf, and performs the necessary provisioning on the fabric to enable the networking for the cluster.
+Each network infrastructure unit (referred to as a fabric) that is managed as an independent entity, is modeled in CNO using the FabricInfra CRD. The network admin creates a FabricInfra CR to establish the identity of the of that fabric, and allows the network admin to specify the set of resources available to be consumed on that fabric. CNO reserves these resources in the FabricInfra on the cluster's behalf, and performs the necessary provisioning on the fabric to enable the networking for the cluster.
 
 ##### 4.1.1.1 Fabric Identity
 The following fields are required when creating the FabricInfra:
@@ -395,7 +395,7 @@ The kubernetes_nodes and top-of-the-rack interconnection topology per fabric is 
       - name: k8s-node4
 ```
 
-The specification of the topology section is required when the fabric is intended to be used for clusters with the Calico CNI, its optional if only the ACI-CNI is intended to be deployed. The rack and aci_pod_id properties are user defined, where as the lead IDs correspond to their correponding values on the fabric.
+The specification of the topology section is required when the fabric is intended to be used for clusters with the Calico CNI, its optional if only the ACI-CNI is intended to be deployed. The rack and aci_pod_id properties are user defined, where as the leaf IDs point to their corresponding values on the fabric.
 
 Note: If deploying more than one cluster with Calico CNI, current limitations require the topology to be specified as a part of the ClusterNetworkProfile.
 
@@ -412,7 +412,10 @@ The BGP configuration for the fabric can be specified as follows:
 The specification of the bgp section is required when the fabric is intended to be used for the Calico CNI, its optional if only the ACI-CNI is intended to be deployed.
 
 ##### 4.1.1.4 Allocation Status
-All avaliable and allocated resource are refelected in the status field of the FabricInfra as shown in the example below:
+All available and allocated resource are ref![image](https://github.com/user-attachments/assets/aa0d3947-2ac0-44b1-b178-7f131cd1927c)
+![image](https://github.com/user-attachments/assets/77dab8c1-0c99-462d-94ed-071e5a888f04)
+![image](https://github.com/user-attachments/assets/1f45da46-14ff-4145-8a2d-becbaebc674a)
+lected in the status field of the FabricInfra as shown in the example below:
 
 ```bash
 status:
@@ -486,7 +489,11 @@ Existing clusters with a functional CNI provisioned with acc-provision flavors f
 ##### 4.1.2.1 Unmanaged CNI
 * Pre-requisite: The network admin has on-boarded the fabric by creating a [FabricInfra CR](#4111-fabric-identity).
 
-This worfklow is initiated in the Workload Cluster which needs to be imported.
+This workf![image](https://github.com/user-attachments/assets/396494fa-f0f6-49b8-ac7e-e712af42de24)
+![image](https://github.com/user-attachments/assets/ba02a0db-a07b-410b-a6d1-5d0059906646)
+![image](https://github.com/user-attachments/assets/696cabb4-7e3e-4f5c-94f8-c5423b7f59b2)
+![image](https://github.com/user-attachments/assets/01c863c4-9789-4e21-bec1-efcd890d2062)
+low is initiated in the Workload Cluster which needs to be imported.
 
 The first step is to create the secrets to access a Github repo as shown [here](#321-create-secret-for-github-access).
 
@@ -526,7 +533,7 @@ This will trigger the workflow on the workload cluster once Argo CD syncs, such 
 #### 4.1.3 Greenfield Clusters
 * Pre-requisite: The network admin has on-boarded the fabric by creating a [FabricInfra CR](#4111-fabric-identity). In addition, depending on the CNI that is intended to be deployed, additional FabricInfra configuration may be required as indicated in the section [Fabric Resources for Greenfield Clusters](#4113-fabric-resources-for-greenfield-clusters). As such, for existing ACI users already familiar with configuring the acc-provision input file, the [Brownfield workflow](#412-brownfield-clusters) might be preferable to on-ramp their clusters (even new clusters) as opposed to this Greenfield workflow.
 
-* Note that in the Calico CNI case the topology model in the FabricInfra is currently resrticted to specifying host-level connectivity only for a single Workload Cluster. This can be worked around by explicitly specifying the topology per cluster in the ClusterProfile or ClusterNetworkProfile CRs.
+* Note that in the Calico CNI case the topology model in the FabricInfra is currently restricted to specifying host-level connectivity only for a single Workload Cluster. This can be worked around by explicitly specifying the topology per cluster in the ClusterProfile or ClusterNetworkProfile CRs.
 
 The user creates a simple ClusterProfile and specifies the CNI.
 
@@ -674,7 +681,7 @@ To upgrade from 0.9.0 release to 0.9.1 use the following helm upgrade command us
 ```bash
   helm upgrade --install netop-org-manager cko/netop-org-manager -n netop-manager --create-namespace --version 0.9.1 -f my_values.yaml --wait
 ```
-To upgrade the CRDs use the following commaind:
+To upgrade the CRDs use the following command:
 ```bash
   kubectl apply -f https://raw.githubusercontent.com/noironetworks/netop-manifests/cko-mvp-1/control/netop-org-manager-crd.yaml     
 ```
@@ -713,7 +720,7 @@ kubectl get pods -n netop-manager
 
 After applying ClusterGroupProfile, ClusterProfile Custom Resources (CR) and optionally Config_Map for ClusterNetworkProfile, the workload cluster's network configuration is represented as a Custom Resource *clusterinfoes.netop.mgr* in the Control Cluster. 
 
-*Note* this is namespaced resouce, which will be created in the namespace you specified during creation of control cluster. Use following command to verify network configuration for workload cluster:
+*Note* this is namespaced resource, which will be created in the namespace you specified during creation of control cluster. Use following command to verify network configuration for workload cluster:
 
 ```
 kubectl describe clusterinfoes.netop.mgr -n netop-manager <WORKLOAD_CLUSTER_NAME> 
@@ -762,9 +769,9 @@ Regardless of the CNI installed, verify that all pods get IP address and are in 
 
 #### 5.2.2 View summary of CNI network configuration of Worlkoad Cluster
 
-The CniOps Custom Resource tracks usage of the network resources, IP pools allocations to nodes. It also tracks and checks for any inconsitencies and stale objects. 
+The CniOps Custom Resource tracks usage of the network resources, IP pools allocations to nodes. It also tracks and checks for any inconsistencies and stale objects. 
 
-Use following commang to verify status of the CNI:
+Use following command to verify status of the CNI:
 
 ```
 kubectl describe cniops <CNIOPS_NAME>
@@ -875,7 +882,7 @@ It collects outputs from various fields like events and logs and displays in sin
 ## 6. Troubleshooting
 
 ### 6.1 Brownfield case
-Following notifications are required from workload cluster to initiate cluster profile creation.Note that brownfield is only supported where the corresponding CNI is supported through acc-provision.
+Following notifications are required from workload cluster to initiate cluster profile creation. Note that brownfield is only supported where the corresponding CNI is supported through acc-provision.
 
 #### 6.1.1 CNI neutral notifications required for all CNI
 
@@ -1224,7 +1231,7 @@ This CR would capture a snapshot of the currently generated manifests during pro
 In the event of a failure in APIC unprovisioning, as indicated by the netop-fabric-manager pod logs, users can refer to these shadowresources for troubleshooting purposes.
 
 ##### Diagnostic Steps
-###### On Exisiting Cluster
+###### On Existing Cluster
 Run the following command to retrieve the shadowresource for a specific cluster profile in the netop-manager namespace:
 
 - ```kubectl get shadowresources -n netop-manager <cluserinfoname>```
