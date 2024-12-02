@@ -1212,6 +1212,8 @@ Network Operator can load VLAN mapping data at the time of installation from a *
 |:--:|
 | *VLAN spreadsheet format* |
 
+##### 8.2.5.1 Fresh installation use case
+
 Excel sheet has to be converted to CSV format and path to the file has to be specified in the acc-provision-input.yaml as:
 
 ```yaml
@@ -1224,6 +1226,23 @@ the NadVlanMap populated with the information from CSV file will be part of acc-
 ```bash
 acc-provision -a -f openshift-sdn-ovn-baremetal -u admin -p ”password” -c acc_provision_input.yaml -o acc-provision-output.yaml
 ```
+
+##### 8.2.5.2 Adding VLANs in NAD VLAN map case
+
+Modified excel sheet has to be converted to CSV format and path to the file has to be specified in the acc-provision-input.yaml as:
+
+```yaml
+chained_cni_config.vlans_file: "nad_vlan_map_input_v2.csv"
+```
+In this example, `nad_vlan_map_input_v2.csv` has been located in the current directory from which acc-provision will be executed.
+
+Also, metnion old CSV (or CSV used for last provisioning) file path in argumennt of acc-provision command as:
+
+```bash
+acc-provision --upgrade -f openshift-sdn-ovn-baremetal -c acc_provision_input.yaml -o acc-provision-output.yaml --old-nad-vlan-map-input nad_vlan_map_input_v1.csv
+```
+In this example, `nad_vlan_map_input_v1.csv` is NAD VLAN map input file used in last provisioning and has been located in the current directory from which acc-provision will be executed.
+
 ## 9. Primary CNI chaining (tech-preview)
 
 **&#9432;** ___NOTE:___ _This is tech-preview feature, not currently supported in production environments._
