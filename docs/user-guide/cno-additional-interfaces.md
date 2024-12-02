@@ -1119,7 +1119,9 @@ spec:
   - "201"
 ```
 
-You can add more vlans by editing the `default` FabricVlanPool resource, or by creating your own in the namespace where your NAD definition will be created. 
+You can add more vlans by editing the `default` FabricVlanPool resource, or by creating your own in the namespace where your NAD definition will be created.
+To add new vlans in FabricVlanPool resource without affecting traffic, always add new vlans in a separate range in the fabricvlanpool CR, if directly editing the CR(If using nad-vlan-map, acc-provision addresses this: see section on NAD VLAN map case).
+If each vlan in the new range is expected to removed at some point of time, please add that vlan in a range by itself(eg: 600-600 or comma separated <>,600). Otherwise removal of any vlan in the range would affect traffic in the other vlans momentarily(since range cannot be modified and has to be deleted and recreated to remove a specific vlan in the range).
 
 **&#9432;** ___NOTE:___ _when no match will be found for NAD prefix name in the NadVlanMap, Network Operator will create BD/EPGs for each VLAN defined in the FabricVlanPool `default` and FabricVlanPool in the namespace where NAD is created._ 
 
@@ -1212,6 +1214,8 @@ Network Operator can load VLAN mapping data at the time of installation from a *
 |:--:|
 | *VLAN spreadsheet format* |
 
+##### 8.2.5.1 Fresh installation use case
+
 Excel sheet has to be converted to CSV format and path to the file has to be specified in the acc-provision-input.yaml as:
 
 ```yaml
@@ -1224,6 +1228,25 @@ the NadVlanMap populated with the information from CSV file will be part of acc-
 ```bash
 acc-provision -a -f openshift-sdn-ovn-baremetal -u admin -p ”password” -c acc_provision_input.yaml -o acc-provision-output.yaml
 ```
+
+##### 8.2.5.2 Adding VLANs in NAD VLAN map case with no traffic disruption
+
+Modified excel sheet has to be converted to CSV format and path to the file has to be specified in the acc-provision-input.yaml as:
+
+```yaml
+chained_cni_config.vlans_file: "nad_vlan_map_input_v2.csv"
+```
+In this example, `nad_vlan_map_input_v2.csv` has been located in the current directory from which acc-provision will be executed.
+
+Also, metnion old CSV (or CSV used for last provisioning) file path in argument of acc-provision command as:
+
+```bash
+acc-provision --upgrade -f openshift-sdn-ovn-baremetal -c acc_provision_input.yaml -o acc-provision-output.yaml --old-nad-vlan-map-input nad_vlan_map_input_v1.csv
+```
+In this example, `nad_vlan_map_input_v1.csv` is NAD VLAN map input file used in last provisioning and has been located in the current directory from which acc-provision will be executed.
+
+`--old-nad-vlan-map-input` - Without providing old nad-vlan-map file, vlan ranges in pool will be coalesced greedily, which may affect existing traffic, because existing pools would be deleted and recreated.
+
 ## 9. Primary CNI chaining (tech-preview)
 
 **&#9432;** ___NOTE:___ _This is tech-preview feature, not currently supported in production environments._
