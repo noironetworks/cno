@@ -1238,7 +1238,7 @@ chained_cni_config.vlans_file: "nad_vlan_map_input_v2.csv"
 ```
 In this example, `nad_vlan_map_input_v2.csv` has been located in the current directory from which acc-provision will be executed.
 
-Also, metnion old CSV (or CSV used for last provisioning) file path in argument of acc-provision command as:
+Also, mention old CSV (or CSV used for last provisioning) file path in argument of acc-provision command as:
 
 ```bash
 acc-provision --upgrade -f openshift-sdn-ovn-baremetal -c acc_provision_input.yaml -o acc-provision-output.yaml --old-nad-vlan-map-input nad_vlan_map_input_v1.csv
