@@ -169,6 +169,7 @@ chained_cni_config:
   # primary_interface_chaining: false      # (optional) enable CNI chaining for primary CNI – Network Operator will check connectivity to gateway prior allowing Pod to start. Currently not supported by Red Hat.
   # primary_cni_path: "/mnt/cni-conf/cni/net.d/10-ovn-kubernetes.conf” # (optional) if specified, primary CNI will be chained as well – this is not required by current use-case.
   secondary_vlans: [101,102,103,104,201]   # (optional) definite list of all vlans that should be populated in VLAN Pool for secondary intefaces
+  include_network_attachment_definition_crd: true # if true, provisioning will generate network-attach-definition CRD in deployment manifests. By default it's false.
 
 registry:                                  # Registry information 
   image_prefix: quay.io/noiro
