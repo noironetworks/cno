@@ -1166,7 +1166,9 @@ NetworkFabricConfiguration CR can also be used to:
 - provide custom names for ApplicationProfile, EPG, BD when using vlan references directly [Doesn't work for NadVlanLabel reference].
 - associate a different tenant for BD, EPG.
 - associate EPG with contracts as consumer/provider.
-- associate subnets with BD. Note that subnet with Gateway address has to be provided.[eg. Not 10.2.0.0/24 rather 10.2.0.1/24]
+- associate subnets with BD. Note that subnet with Gateway address has to be provided.[eg. Not 10.2.0.0/24 rather 10.2.0.1/24].
+  - subnet scope options `advertise-externally`, `shared-between-vrfs` can be defined with subnet
+  - subnet control options `nd-ra-prefix`, `no-default-svi-gateway`, `querier-ip` can be defined with subnet
 - associate VRF in common or same tenant with BD. 
 
 Assuming that the user has pre-created the following new objects mentioned in the CR in ACI.
@@ -1196,7 +1198,14 @@ spec:
          name: custom-bd1
          common-tenant: false
          subnets:
-         - "10.2.3.0/24"
+         - subnet: "10.2.3.0/24"
+           scope:
+            - advertise-externally
+            - shared-between-vrfs
+           control:
+            - nd-ra-prefix
+            - querier-ip
+            - no-default-svi-gateway
          vrf:
            name: common-vrf1
            common-tenant: true
